@@ -1,0 +1,8 @@
+qtest
+*.o
+*.o.d
+*.dSYM
+*.exe
+.vscode
+.devcontainer
+tmp/*

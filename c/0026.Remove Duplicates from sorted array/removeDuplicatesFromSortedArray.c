@@ -42,6 +42,53 @@ int removeDuplicates_v2(int *nums, int numsSize)
         }
     }
 
+    // j points to the last of unique elements, so the length is j + 1.
+    return j + 1;
+}
+
+/* Change the checking condition */
+int removeDuplicates_v3(int *nums, int numsSize)
+{
+    if (nums == NULL || numsSize == 0)
+        return 0;
+
+    int j = 0;  // the index of the modified items
+
+    /*
+     * Check the fast-runner i and the slow-runner j, if we find
+     * nums[i] != nums[j], put the value (i.e. nums[i]) to nums[j+1].
+     *
+     * Note the start and the end of i are different from v2. We skip the i=0
+     * (no need to check nums[i=0] and nums[j=0], it's always the same.) and the
+     * i will run to the end of array.
+     */
+    for (int i = 1; i < numsSize; i++) {
+        if (nums[i] != nums[j]) {
+            nums[++j] = nums[i];
+        }
+    }
+
+    // j points to the last of unique elements, so the length is j + 1.
+    return j + 1;
+}
+
+/* using while loop */
+int removeDuplicates_v4(int *nums, int numsSize)
+{
+    if (nums == NULL || numsSize == 0)
+        return 0;
+
+    int i = 0;
+    int j = 0;  // the index of the modified items
+
+    while (i < numsSize) {
+        if (nums[i] != nums[j])
+            nums[++j] = nums[i++];
+        else
+            i++;
+    }
+
+    // j points to the last of unique elements, so the length is j + 1.
     return j + 1;
 }
 

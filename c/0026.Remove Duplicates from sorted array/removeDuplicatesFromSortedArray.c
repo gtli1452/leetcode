@@ -78,14 +78,13 @@ int removeDuplicates_v4(int *nums, int numsSize)
     if (nums == NULL || numsSize == 0)
         return 0;
 
-    int i = 0;
+    int i = 1;  // nums[i=0] and nums[j=0] are same.
     int j = 0;  // the index of the modified items
 
     while (i < numsSize) {
         if (nums[i] != nums[j])
-            nums[++j] = nums[i++];
-        else
-            i++;
+            nums[++j] = nums[i];
+        i++;
     }
 
     // j points to the last of unique elements, so the length is j + 1.

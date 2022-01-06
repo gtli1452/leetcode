@@ -100,13 +100,47 @@ void rotate_v3(int *nums, int numsSize, int k)
     reverse(&nums[0], &nums[numsSize - 1]);
 }
 
+/*
+ * This is the reduced-memory version of the solution 1.
+ * Time complexity : O(n)
+ * Space complexity: O(1)
+ */
+void rotate_v4(int *nums, int numsSize, int k)
+{
+    k %= numsSize;
+    if (numsSize <= 1 || k == 0)
+        return;
+
+    int cur = 0, next = k;
+    int used = cur;
+    int tmp, data = nums[cur];
+
+    for (int i = 0; i < numsSize; i++) {
+        tmp = nums[next];
+        nums[next] = data;
+        data = tmp;
+
+        /*
+         * if cur = used, it means that we meet a circle. So move the next one
+         * Refer to haoel's rotate2:
+         * https://github.com/haoel/leetcode/blob/master/algorithms/cpp/rotateArray/rotateArray.cpp
+         */
+        cur = next;
+        if (cur == used) {
+            used = ++cur;
+            data = nums[cur];
+        }
+        next = (cur + k) % numsSize;
+    }
+}
+
 int main()
 {
-    int nums[] = {1, 2, 3, 4, 5, 6, 7, 8};
-    int k = 6;
+    int nums[] = {0, 1};
+    int k = 2;
     int numsSize = sizeof(nums) / sizeof(nums[0]);
 
-    rotate(nums, numsSize, k);
+    rotate_v4(nums, numsSize, k);
 
     for (int i = 0; i < numsSize; i++) {
         printf("%d, ", nums[i]);

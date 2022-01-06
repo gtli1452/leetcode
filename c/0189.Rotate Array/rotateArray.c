@@ -35,14 +35,16 @@ void rotate_v2(int *nums, int numsSize, int k)
 
     k %= numsSize;
 
+    /*
+     * Refer to
+     * http://leetcode.wang/leetcode-189-Rotate-Array.html#%E8%A7%A3%E6%B3%95%E4%B8%80
+     */
     for (int i = 0; i < k; i++) {
-        int cur = nums[0];
-        for (int j = 1; j < numsSize; j++) {
-            int tmp = nums[j];
-            nums[j] = cur;
-            cur = tmp;
+        int last = nums[numsSize - 1];
+        for (int j = numsSize - 1; j > 0; j--) {
+            nums[j] = nums[j - 1];
         }
-        nums[0] = cur;
+        nums[0] = last;
     }
 }
 

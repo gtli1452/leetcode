@@ -33,15 +33,16 @@ void rotate_v2(int *nums, int numsSize, int k)
     if (numsSize <= 1 || k == 0)
         return;
 
-    int right, left;
+    k %= numsSize;
 
     for (int i = 0; i < k; i++) {
-        left = nums[0];
-        for (int j = 0; j < numsSize; j++) {
-            right = nums[(j + 1) % numsSize];
-            nums[(j + 1) % numsSize] = left;
-            left = right;
+        int cur = nums[0];
+        for (int j = 1; j < numsSize; j++) {
+            int tmp = nums[j];
+            nums[j] = cur;
+            cur = tmp;
         }
+        nums[0] = cur;
     }
 }
 
@@ -94,11 +95,11 @@ void rotate_v3(int *nums, int numsSize, int k)
 
 int main()
 {
-    int nums[] = {1, 2, 3};
+    int nums[] = {1, 2, 3, 4, 5};
     int k = 2;
     int numsSize = sizeof(nums) / sizeof(nums[0]);
 
-    rotate_v3(nums, numsSize, k);
+    rotate_v2(nums, numsSize, k);
 
     // reverse(nums + 2, nums + numsSize - 2);
 

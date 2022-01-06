@@ -12,12 +12,17 @@ void rotate(int *nums, int numsSize, int k)
     if (numsSize <= 1 || k == 0)
         return;
 
+    k %= numsSize;
     int tmp[numsSize];
 
-    for (int i = 0; i < numsSize; i++) {
-        tmp[(i + k) % numsSize] = nums[i];
+    // copy the last k items
+    for (int i = 0; i < k; i++) {
+        tmp[i] = nums[numsSize - k + i];
     }
-
+    // copy the first numsSize - k items
+    for (int i = 0; i < numsSize - k; i++) {
+        tmp[i + k] = nums[i];
+    }
     for (int i = 0; i < numsSize; i++) {
         nums[i] = tmp[i];
     }
@@ -97,13 +102,11 @@ void rotate_v3(int *nums, int numsSize, int k)
 
 int main()
 {
-    int nums[] = {1, 2, 3, 4, 5};
-    int k = 2;
+    int nums[] = {1, 2, 3, 4, 5, 6, 7, 8};
+    int k = 6;
     int numsSize = sizeof(nums) / sizeof(nums[0]);
 
-    rotate_v2(nums, numsSize, k);
-
-    // reverse(nums + 2, nums + numsSize - 2);
+    rotate(nums, numsSize, k);
 
     for (int i = 0; i < numsSize; i++) {
         printf("%d, ", nums[i]);

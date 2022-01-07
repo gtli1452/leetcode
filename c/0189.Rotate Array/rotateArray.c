@@ -86,8 +86,8 @@ void rotate_v3(int *nums, int numsSize, int k)
     k %= numsSize;
 
     /*
-     *  nums[] = x[0], x[1], ..., x[len-k-1], x[len-k], ..., x[len-1]
-     *             ^~~~    len-k    ~~~^          ^~~~   k    ~~~^
+     *  nums[] = x[0], x[1], ..., x[n-k-1], x[n-k], ..., x[n-1]
+     *             ^~~~    n-k    ~~~^         ^~~~   k   ~~~^
      *
      * the key point is that (X^T * Y^T)^T = YX, where
      * - X and Y are sub-array of nums
@@ -134,13 +134,50 @@ void rotate_v4(int *nums, int numsSize, int k)
     }
 }
 
+/*
+ * Very concise version
+ * Refer to
+ * https://leetcode.com/problems/rotate-array/discuss/54263/3-lines-of-c-in-one-pass-using-swap
+ * Time complexity : O(n-1)
+ * Space complexity: O(1)
+ */
+void rotate_v5(int nums[], int n, int k)
+{
+    if (n == 0)
+        return;
+    /*
+     * The outer loop determines how many items have not been processed, and `k`
+     * means that `k` steps to rotate (i.e. the last `k` items will be put
+     * to the front).
+     *
+     * After every outer loop, `k` item will be processed (that's the meaning
+     * for `n-=k`).
+     *
+     * The inner loop swaps the last `k` items to the correct position (move
+     * to the front).
+     *
+     * The netizen's explanation:
+     * https://leetcode.com/problems/rotate-array/discuss/54263/3-lines-of-C++-in-one-pass-using-swap/55914
+     */
+    for (; k %= n; n -= k)
+        for (int i = 0; i < k; i++)
+            swap(nums++, &nums[n - k]);
+
+    /*
+     * A version without undefined behavior (if n = 0) and easier to understand.
+     * for (; k %= n; n -= k, nums += k)
+     *     for (int i = 0; i < k; i++)
+     *         swap(nums[i], nums[n - k + i]);
+     */
+}
+
 int main()
 {
-    int nums[] = {0, 1};
-    int k = 2;
+    int nums[] = {1, 2, 3, 4, 5, 6, 7};
+    int k = 3;
     int numsSize = sizeof(nums) / sizeof(nums[0]);
 
-    rotate_v4(nums, numsSize, k);
+    rotate_v5(nums, numsSize, k);
 
     for (int i = 0; i < numsSize; i++) {
         printf("%d, ", nums[i]);

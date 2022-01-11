@@ -4,8 +4,6 @@
  */
 
 #include "stdbool.h"
-#include "stdint.h"
-#include "stdio.h"
 #include "stdlib.h"
 
 struct node {
@@ -13,21 +11,19 @@ struct node {
     struct node *next;
 };
 
-struct hash_tb {
+typedef struct {
     int size;
     struct node **tb;
-};
+} map_t;
 
 typedef struct node node_t;
-typedef struct hash_tb tb_t;
 
 int next_prime(int n)
 {
     if (n % 2 == 0)
         n++;
-    int i;
     for (;; n += 2) {
-        for (i = 3; i <= sqrt(n); i++)
+        for (int i = 3; i <= sqrt(n); i++)
             if (n % i == 0)
                 goto out;
         return n;
@@ -40,57 +36,55 @@ int hash(int key, int table_size)
     return abs(key) % table_size;
 }
 
-tb_t *init_hash_tb(int size)
+map_t *init_hash_tb(int size)
 {
-    tb_t *h;
-    h = malloc(sizeof(tb_t));
-    h->size = next_prime(size);
-    h->tb = (node_t **) malloc(sizeof(node_t *) * h->size);
-    for (int i = 0; i < h->size; i++) {
-        h->tb[i] = malloc(sizeof(node_t));
-        h->tb[i]->next = NULL;
+    map_t *m = malloc(sizeof(map_t));
+    m->size = next_prime(size);
+    m->tb = (node_t **) malloc(sizeof(node_t *) * m->size);
+    for (int i = 0; i < m->size; i++) {
+        m->tb[i] = malloc(sizeof(node_t));
+        m->tb[i]->next = NULL;
     }
-    return h;
+    return m;
 }
 
-node_t *find_node(int key, tb_t *h)
+node_t *find_node(map_t *m, int key)
 {
-    node_t *p;
-    p = h->tb[hash(key, h->size)]->next;
+    node_t *p = m->tb[hash(key, m->size)]->next;
 
     while (p != NULL && p->data != key)
         p = p->next;
     return p;
 }
 
-void add_node(int key, tb_t *h)
+void add_node(map_t *m, int key)
 {
     node_t *pos, *l;
 
-    pos = find_node(key, h);
+    pos = find_node(m, key);
 
     if (pos == NULL) {
         node_t *new_node = (node_t *) malloc(sizeof(node_t));
-        l = h->tb[hash(key, h->size)];
+        l = m->tb[hash(key, m->size)];
         new_node->next = l->next;
         l->next = new_node;
         new_node->data = key;
     }
 }
 
-void free_hash_tb(tb_t *h, int size)
+void free_hash_tb(map_t *m, int size)
 {
     node_t *tmp = NULL, *del_node = NULL;
 
     for (int i = 0; i < size; i++) {
-        tmp = h->tb[i];
+        tmp = m->tb[i];
         while (tmp) {
             del_node = tmp;
             tmp = tmp->next;
             free(del_node);
         }
     }
-    free(h);
+    free(m);
 }
 
 bool containsDuplicate(int *nums, int numsSize)
@@ -98,17 +92,14 @@ bool containsDuplicate(int *nums, int numsSize)
     if (numsSize < 2)
         return false;
 
-    tb_t *h = init_hash_tb(numsSize + 1);
+    map_t *m = init_hash_tb(numsSize + 1);
 
     for (int i = 0; i < numsSize; i++) {
-        node_t *node = find_node(nums[i], h);
+        node_t *node = find_node(m, nums[i]);
         if (node != NULL)
             return true;
         else
-            add_node(nums[i], h);
+            add_node(m, nums[i]);
     }
-    return false;
-
-
     return false;
 }

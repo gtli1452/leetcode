@@ -40,11 +40,7 @@ map_t *init_hash_tb(int size)
 {
     map_t *m = malloc(sizeof(map_t));
     m->size = next_prime(size);
-    m->tb = (node_t **) malloc(sizeof(node_t *) * m->size);
-    for (int i = 0; i < m->size; i++) {
-        m->tb[i] = malloc(sizeof(node_t));
-        m->tb[i]->next = NULL;
-    }
+    m->tb = (node_t **) calloc(m->size, sizeof(node_t *));
     return m;
 }
 
@@ -52,23 +48,30 @@ node_t *find_node(map_t *m, int key)
 {
     node_t *p = m->tb[hash(key, m->size)]->next;
 
-    while (p != NULL && p->data != key)
-        p = p->next;
+    while (p != NULL) {
+        if (p->data == key)
+            return p;
+        else
+            p = p->next;
+    }
     return p;
 }
 
 void add_node(map_t *m, int key)
 {
-    node_t *pos, *l;
+    int idx = hash(key, m->size);
+    if (find_node(m, key) == NULL) {
+        node_t *q = (node_t *) malloc(sizeof(node_t));
+        q->data = key;
 
-    pos = find_node(m, key);
-
-    if (pos == NULL) {
-        node_t *new_node = (node_t *) malloc(sizeof(node_t));
-        l = m->tb[hash(key, m->size)];
-        new_node->next = l->next;
-        l->next = new_node;
-        new_node->data = key;
+        node_t *p = m->tb[idx];
+        if (p == NULL) {
+            q->next = NULL;
+            m->tb[idx] = q;
+        } else {
+            q->next = p->next;
+            p->next = q;
+        }
     }
 }
 
@@ -95,8 +98,7 @@ bool containsDuplicate(int *nums, int numsSize)
     map_t *m = init_hash_tb(numsSize + 1);
 
     for (int i = 0; i < numsSize; i++) {
-        node_t *node = find_node(m, nums[i]);
-        if (node != NULL)
+        if (find_node(m, nums[i]) != NULL)
             return true;
         else
             add_node(m, nums[i]);

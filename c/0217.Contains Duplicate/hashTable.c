@@ -19,22 +19,27 @@ typedef struct hash_node node_t;
 node_t **init_hash_tb(int n)
 {
     node_t **a = (node_t **) malloc(sizeof(node_t *) * n);
-
     for (int i = 0; i < n; i++)
         a[i] = NULL;
+    /*
+     * We also can use `calloc` to create, this func will initialize the memory.
+     * node_t **a = (node_t *) calloc(n, sizeof(node_t));
+     */
 
     return a;
 }
 
 int hash(int x, int n)
 {
-    return (x % n) >= 0 ? (x % n) : (x % n + n);
+    int idx = x % n;
+    return x < 0 ? idx + n : idx;
 }
 
 bool search_node(node_t **table, int x, int n)
 {
     int index = hash(x, n);
     node_t *p = table[index];
+
     while (p != NULL) {
         if (p->val == x)
             return true;
@@ -45,8 +50,6 @@ bool search_node(node_t **table, int x, int n)
 
 void add_node(node_t **table, int x, int n)
 {
-    int index = hash(x, n);
-
     if (search_node(table, x, n) == true)
         return;
 
@@ -54,7 +57,9 @@ void add_node(node_t **table, int x, int n)
     q->val = x;
     q->next = NULL;
 
+    int index = hash(x, n);
     node_t *p = table[index];
+
     if (p == NULL) {
         table[index] = q;
         return;
@@ -67,15 +72,15 @@ void add_node(node_t **table, int x, int n)
 
 void del_node(node_t **table, int x, int n)
 {
-    int index = hash(x, n);
-
     if (search_node(table, x, n) == false)
         return;
 
+    int index = hash(x, n);
     node_t *p = table[index];
 
     while (p->val != x)
         p = p->next;
+
     node_t *q = p;
     p = p->next;
     free(q);
@@ -91,7 +96,8 @@ bool containsDuplicate(int *nums, int numsSize)
     for (int i = 0; i < numsSize; i++) {
         if (search_node(table, nums[i], HashSize) == true)
             return true;
-        add_node(table, nums[i], HashSize);
+        else
+            add_node(table, nums[i], HashSize);
     }
 
     return false;

@@ -29,11 +29,11 @@ bool containsDuplicate(int *nums, int numsSize)
     struct HashNode **hash_table =
         (struct HashNode **) calloc(hash_size, sizeof(struct HashNode *));
 
-    int i;
-    for (i = 0; i < numsSize; i++) {
+    for (int i = 0; i < numsSize; i++) {
         int index = hash(nums[i], hash_size);
         struct HashNode **p = hash_table + index;
 
+        /* travel the whole linked-list to check the duplicate */
         while (*p) {
             if ((*p)->data == nums[i]) {
                 duplicated = true;
@@ -42,6 +42,7 @@ bool containsDuplicate(int *nums, int numsSize)
             p = &((*p)->next);
         }
 
+        /* add the new node into the tail */
         struct HashNode *new_node =
             (struct HashNode *) malloc(sizeof(struct HashNode));
         new_node->data = nums[i];
@@ -50,8 +51,8 @@ bool containsDuplicate(int *nums, int numsSize)
         *p = new_node;
     }
 
-OUT:
-    for (i = 0; i < hash_size; i++) {
+OUT: /* free all the linked nodes in each bucket. */
+    for (int i = 0; i < hash_size; i++) {
         struct HashNode *t = hash_table[i];
         struct HashNode *x = NULL;
         while (t) {

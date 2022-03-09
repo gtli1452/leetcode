@@ -3,88 +3,73 @@
 #include "stdlib.h"
 
 struct node {
-    int data;
+    int val;
     struct node *next;
 };
 
-struct hash_tb {
-    int size;
-    struct node **tb;
-};
-
 typedef struct node node_t;
-typedef struct hash_tb tb_t;
+typedef struct node **tb_t;
 
-int next_prime(int n)
+tb_t *create_tb(int n)
 {
-    if (n % 2 == 0)
-        n++;
-    int i;
-    for (;; n += 2) {
-        for (i = 3; i <= sqrt(n); i++)
-            if (n % i == 0)
-                goto out;
-        return n;
-    out:;
-    }
+    return (tb_t *) calloc(n, sizeof(node_t *));
 }
 
-int hash(int key, int table_size)
+int hash(int key, int n)
 {
-    return abs(key) % table_size;
+    int idx = key % n;
+    return idx < 0 ? idx + n : idx;
 }
 
-tb_t *init_hash_tb(int size)
+bool search_node(tb_t *t, int key, int n)
 {
-    tb_t *h;
-    h = malloc(sizeof(tb_t));
-    h->size = next_prime(size);
-    h->tb = (node_t **) malloc(sizeof(node_t *) * h->size);
-    for (int i = 0; i < h->size; i++) {
-        h->tb[i] = malloc(sizeof(node_t));
-        h->tb[i]->next = NULL;
-    }
-    return h;
-}
+    int idx = hash(key, n);
+    node_t *p = t[idx];
 
-node_t *find_node(int key, tb_t *h)
-{
-    node_t *p;
-    p = h->tb[hash(key, h->size)]->next;
-
-    while (p != NULL && p->data != key)
+    while (p != NULL) {
+        if (p->val == key)
+            return true;
         p = p->next;
-    return p;
+    }
+    return false;
 }
 
-void add_node(int key, tb_t *h)
+void add_node(tb_t *t, int key, int n)
 {
-    node_t *pos, *l;
+    if (search_node(t, key, n))
+        return;
 
-    pos = find_node(key, h);
+    int idx = hash(key, n);
 
-    if (pos == NULL) {
-        node_t *new_node = (node_t *) malloc(sizeof(node_t));
-        l = h->tb[hash(key, h->size)];
-        new_node->next = l->next;
-        l->next = new_node;
-        new_node->data = key;
+    /* create a new node */
+    node_t *q = (node_t *) malloc(sizeof(node_t));
+    q->val = key;
+    q->next = NULL;
+
+    node_t *p = t[idx];
+    if (p == NULL) {
+        t[idx] = q;
+    } else {
+        while (p->next != NULL)  // add the node in the tail
+            p = p->next;
+        p->next = q;
     }
 }
 
-void free_hash_tb(tb_t *h, int size)
+void del_node(tb_t *t, int key, int n)
 {
-    node_t *tmp = NULL, *del_node = NULL;
+    if (!search_node(t, key, n))
+        return;
 
-    for (int i = 0; i < size; i++) {
-        tmp = h->tb[i];
-        while (tmp) {
-            del_node = tmp;
-            tmp = tmp->next;
-            free(del_node);
-        }
-    }
-    free(h);
+    int idx = hash(key, n);
+    node_t *p = t[idx];
+
+    while (p->val != key)
+        p = p->next;
+
+    node_t *q = p;
+    p = p->next;
+    free(q);
 }
 
 bool containsDuplicate(int *nums, int numsSize)
@@ -92,17 +77,14 @@ bool containsDuplicate(int *nums, int numsSize)
     if (numsSize < 2)
         return false;
 
-    tb_t *h = init_hash_tb(numsSize + 1);
+    tb_t *tb = create_tb(numsSize);
 
     for (int i = 0; i < numsSize; i++) {
-        node_t *node = find_node(nums[i], h);
-        if (node != NULL)
+        if (search_node(tb, nums[i], numsSize))
             return true;
         else
-            add_node(nums[i], h);
+            add_node(tb, nums[i], numsSize);
     }
-    return false;
-
 
     return false;
 }

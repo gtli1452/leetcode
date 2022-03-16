@@ -52,7 +52,11 @@ struct ListNode *mergeTwoLists_v2(struct ListNode *L1, struct ListNode *L2)
             L2 = L2->next;
         }
     }
-
+    /*
+     * Use the `uintptr_t` to provide a protable and safe way to convert a
+     * pointer to its integer representation. The legnth of a pointer are
+     * different form 32-bit/64-bit machines.
+     */
     *ptr = (struct ListNode *) ((uintptr_t) L1 | (uintptr_t) L2);
 
     return head;

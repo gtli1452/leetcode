@@ -49,6 +49,11 @@ struct ListNode *mergeKLists_v2(struct ListNode **lists, int listsSize)
     while (listsSize > 1) {
         for (int i = 0, j = listsSize - 1; i < j; i++, j--)
             lists[i] = mergeTwoLists(lists[i], lists[j]);
+        /*
+         * Update the number of lists that need to be merged.
+         * If n is even, n' = n / 2; If n is odd, n' = (n + 1) / 2. The
+         * formula for odd number is valid to even numbers.
+         */
         listsSize = (listsSize + 1) / 2;
     }
 
